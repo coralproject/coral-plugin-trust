@@ -113,8 +113,10 @@ const postCreateComment = async (_, args, {user}, info, response) => {
       // If the user is not a reliable commenter (passed the unreliability
       // threshold by having too many rejected comments) then we can change the
       // status of the comment to `PREMOD`, therefore pushing the user's comments
-      // away from the public eye until a moderator can manage them.
-      if (KarmaService.isReliable(user.metadata.trust.comment) === false) {
+      // away from the public eye until a moderator can manage them. This of
+      // course can only be applied if the comment's current status is `NONE`,
+      // we don't want to interfere if the comment was rejected.
+      if (response.comment.status === 'NONE' && KarmaService.isReliable(user.metadata.trust.comment) === false) {
         await CommentsService.pushStatus(comment.id, 'PREMOD');
 
         // Update the response from the comment creation to add the PREMOD so that
