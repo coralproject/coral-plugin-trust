@@ -10,7 +10,7 @@ class KarmaService {
    * of 'comment' or 'flag'. If `multi` is true, then it assumes that `id` is an
    * array of id's.
    */
-  static async modifyUserKarma(id, direction = 1, type = 'comment', multi = false) {
+  static async modifyUser(id, direction = 1, type = 'comment', multi = false) {
     const key = `metadata.trust.${type}.karma`;
 
     let update = {

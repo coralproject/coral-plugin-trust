@@ -54,8 +54,8 @@ const postSetCommentStatus = (_, {id, status}, {loaders: {Comments}}) => {
         // action.
         debug(`FlaggingUser[${flagUserIDs.join(', ')}] had their karma increased`);
         await Promise.all([
-          KarmaService.modifyUserKarma(comment.author_id, -1, 'comment'),
-          KarmaService.modifyUserKarma(flagUserIDs, 1, 'flag', true)
+          KarmaService.modifyUser(comment.author_id, -1, 'comment'),
+          KarmaService.modifyUser(flagUserIDs, 1, 'flag', true)
         ]);
 
       case 'ACCEPTED':
@@ -67,8 +67,8 @@ const postSetCommentStatus = (_, {id, status}, {loaders: {Comments}}) => {
         // action.
         debug(`FlaggingUser[${flagUserIDs.join(', ')}] had their karma reduced`);
         await Promise.all([
-          KarmaService.modifyUserKarma(comment.author_id, 1, 'comment'),
-          KarmaService.modifyUserKarma(flagUserIDs, -1, 'flag', true)
+          KarmaService.modifyUser(comment.author_id, 1, 'comment'),
+          KarmaService.modifyUser(flagUserIDs, -1, 'flag', true)
         ]);
 
       }
