@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "author": "Wyatt Johnson <wyattjoh@gmail.com>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "devDependencies": {
     "eslint": "^3.19.0"
   }
