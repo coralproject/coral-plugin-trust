@@ -7,11 +7,31 @@ debug('THRESHOLDS', RELIABLE_THRESHOLD, UNRELIABLE_THRESHOLD);
 
 module.exports = {
   User: {
+
+    // Extract the reliability from the user metadata.
     reliable(user) {
       if (user && user.metadata && user.metadata.trust) {
-        if (user.metadata.trust.karma >= RELIABLE_THRESHOLD) {
+        return user.metadata.trust;
+      }
+
+      return {};
+    }
+  },
+  Reliability: {
+    flagger(trust) {
+      if (trust && trust.flag) {
+        if (trust.flag.karma >= RELIABLE_THRESHOLD) {
           return true;
-        } else if (user.metadata.trust.karma <= UNRELIABLE_THRESHOLD) {
+        } else if (trust.flag.karma <= UNRELIABLE_THRESHOLD) {
+          return false;
+        }
+      }
+    },
+    commenter(trust) {
+      if (trust && trust.comment) {
+        if (trust.comment.karma >= RELIABLE_THRESHOLD) {
+          return true;
+        } else if (trust.comment.karma <= UNRELIABLE_THRESHOLD) {
           return false;
         }
       }
