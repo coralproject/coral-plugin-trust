@@ -1,9 +1,32 @@
+const debug = require('debug')('coral-plugin-trust');
+
+const RELIABLE_THRESHOLD = parseInt(process.env.TRUST_RELIABLE_THRESHOLD || 0);
+const UNRELIABLE_THRESHOLD = parseInt(process.env.TRUST_UNRELIABLE_THRESHOLD || 0);
+
+debug(`THRESHOLDS Reliable[${RELIABLE_THRESHOLD}] Unreliable[${UNRELIABLE_THRESHOLD}]`);
+
 const UserModel = require('models/user');
 
 /**
  * KarmaService provides interfaces for editing a user's karma.
  */
 class KarmaService {
+
+  /**
+   *
+   * isReliable will inspect the property of the user to match their
+   * reliability score to that of settings.
+   *
+   * @param {Object} property the property containing the karma field to check against
+   */
+  static isReliable(property) {
+    if (property.karma > RELIABLE_THRESHOLD) {
+      return true;
+    } else if (property.karma < UNRELIABLE_THRESHOLD) {
+      return false;
+    }
+    return null;
+  }
 
   /**
    * modifyUserKarma updates the user to adjust their karma, for either the `type`
