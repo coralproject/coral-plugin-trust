@@ -14,6 +14,8 @@ type Reliability {
 
 type User {
 
-  # reliable is the reference to a given user's Reliability.
-  reliable: Reliability!
+  # reliable is the reference to a given user's Reliability. If the requesting
+  # user does not have permission to access the reliability, null will be
+  # returned.
+  reliable: Reliability
 }
