@@ -5,9 +5,11 @@ beheviours of their users.
 
 It currently provides the following features:
 
-- Tracks user karma for how often their comments are flagged.
+- Tracks user karma for how their flagged comments are handled.
 - Tracks flagging user karma if the moderators agree/disagree with the flagging
   action.
+- Marks unreliable commenters comments with a `PREMOD` status which will prevent
+  them from loading in the stream until a moderator can approve them.
 
 ## Configuration
 
