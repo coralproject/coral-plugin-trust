@@ -108,7 +108,7 @@ const postCreateComment = async (_, args, {user}, info, response) => {
     // if we need to change what is returned to the user in order to possibly
     // change the status of the comment now that it has been inserted into the
     // database.
-    if (user && user.metadata && user.metadata.trust && user.metadata.trust.comment) {
+    if (user && user.metadata) {
 
       // If the user is not a reliable commenter (passed the unreliability
       // threshold by having too many rejected comments) then we can change the
@@ -116,7 +116,7 @@ const postCreateComment = async (_, args, {user}, info, response) => {
       // away from the public eye until a moderator can manage them. This of
       // course can only be applied if the comment's current status is `NONE`,
       // we don't want to interfere if the comment was rejected.
-      if (response.comment.status === 'NONE' && KarmaService.isReliable(user.metadata.trust.comment) === false) {
+      if (response.comment.status === 'NONE' && KarmaService.isReliable('comment', user.metadata.trust) === false) {
         await CommentsService.pushStatus(comment.id, 'PREMOD');
 
         // Update the response from the comment creation to add the PREMOD so that

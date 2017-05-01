@@ -16,14 +16,10 @@ module.exports = {
   },
   Reliability: {
     flagger(trust) {
-      if (trust && trust.flag) {
-        return KarmaService.isReliable(trust.flag);
-      }
+      return KarmaService.isReliable('flag', trust);
     },
     commenter(trust) {
-      if (trust && trust.comment) {
-        return KarmaService.isReliable(trust.comment);
-      }
+      return KarmaService.isReliable('comment', trust);
     }
   }
 };

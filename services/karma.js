@@ -1,11 +1,68 @@
 const debug = require('debug')('coral-plugin-trust');
 
-const RELIABLE_THRESHOLD = parseInt(process.env.TRUST_RELIABLE_THRESHOLD || 0);
-const UNRELIABLE_THRESHOLD = parseInt(process.env.TRUST_UNRELIABLE_THRESHOLD || 0);
-
-debug(`THRESHOLDS Reliable[${RELIABLE_THRESHOLD}] Unreliable[${UNRELIABLE_THRESHOLD}]`);
-
 const UserModel = require('models/user');
+
+/**
+ * This will create an object with the property name of the action type as the
+ * key and an object as it's value. This will contain a RELIABLE, and UNRELIABLE
+ * property with the number of karma points associated with their particular
+ * state.
+ * 
+ * If only the RELIABLE variable is provided, then it will also be used as the
+ * UNRELIABLE variable.
+ * 
+ * The form of the environment variable is:
+ * 
+ *  <name>:<RELIABLE>,<UNRELIABLE>;<name>:<RELIABLE>,<UNRELIABLE>;...
+ * 
+ * The default used is:
+ * 
+ *  comment:1,1;flag:-1,-1
+ */
+const parseThresholds = (thresholds) => thresholds
+  .split(';')
+  .filter((threshold) => threshold && threshold.length > 0)
+  .reduce((acc, threshold) => {
+    const thresholds = threshold.split(':');
+    if (thresholds.length < 2) {
+      return acc;
+    }
+
+    let [name, values] = thresholds;
+    let [RELIABLE, UNRELIABLE] = values.split(',').map((value) => parseInt(value));
+
+    if (!(name in acc)) {
+      acc[name] = {};
+    }
+
+    if (isNaN(UNRELIABLE) && !isNaN(RELIABLE)) {
+      acc[name].RELIABLE = RELIABLE;
+      acc[name].UNRELIABLE = RELIABLE;
+    } else {
+      if (!isNaN(UNRELIABLE)) {
+        acc[name].UNRELIABLE = UNRELIABLE;
+      }
+
+      if (!isNaN(RELIABLE)) {
+        acc[name].RELIABLE = RELIABLE;
+      }
+    }
+
+    return acc;
+  }, {
+    comment: {
+      RELIABLE: 1,
+      UNRELIABLE: 1
+    },
+    flag: {
+      RELIABLE: -1,
+      UNRELIABLE: -1
+    }
+  });
+
+const THRESHOLDS = parseThresholds(process.env.TRUST_THRESHOLDS || '');
+
+debug(THRESHOLDS);
 
 /**
  * KarmaService provides interfaces for editing a user's karma.
@@ -13,18 +70,23 @@ const UserModel = require('models/user');
 class KarmaService {
 
   /**
-   *
-   * isReliable will inspect the property of the user to match their
-   * reliability score to that of settings.
-   *
-   * @param {Object} property the property containing the karma field to check against
+   * Inspects the reliability of a property and returns it if known.
+   * @param {String} name - name of the property
+   * @param {Object} trust - object possibly containing the propertys
    */
-  static isReliable(property) {
-    if (property.karma > RELIABLE_THRESHOLD) {
+  static isReliable(name, trust) {
+    if (trust && trust[name]) {
+      if (trust[name].karma > THRESHOLDS[name].RELIABLE) {
+        return true;
+      } else if (trust[name].karma < THRESHOLDS[name].UNRELIABLE) {
+        return false;
+      }
+    } else if (THRESHOLDS[name].RELIABLE < 0) {
       return true;
-    } else if (property.karma < UNRELIABLE_THRESHOLD) {
+    } else if (THRESHOLDS[name].UNRELIABLE > 0) {
       return false;
     }
+
     return null;
   }
 

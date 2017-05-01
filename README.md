@@ -13,19 +13,20 @@ It currently provides the following features:
 
 ## Configuration
 
-The Trust Plugin requries that the following configuration variables are in the
-environment:
+The Trust Plugin requries that the configuration variable `TRUST_THRESHOLDS`.
+The form of the environment variable is:
 
-- `TRUST_RELIABLE_THRESHOLD` - The number of karma points associated with positive
-  actions that would result in that particular user being labled as reliable
-  for that category. _i.e., if the value was `5`, then a user who had flagged
-  `6` comments where the moderators have agreed with their flag (rejected the
-  comment) would then be marked as reliable_.
-- `TRUST_UNRELIABLE_THRESHOLD` - The number of karma points associated with negative
-  actions that would result in that particular user being labled as unreliable
-  for that category. _i.e., if the value was `5`, then a user who had flagged
-  `6` comments where the moderators have disagreed with their flag (accepted the
-  comment and ignored the flag) would then be marked as unreliable_.
+```
+<name>:<RELIABLE>,<UNRELIABLE>;<name>:<RELIABLE>,<UNRELIABLE>;...
+```
+
+The default for this variable is `comment:1,1;flag:-1,-1`. This will create an
+object with the property name of the action type as the key and an object as
+it's value. This will contain a RELIABLE, and UNRELIABLE property with the
+number of karma points associated with their particular state.
+
+If only the RELIABLE variable is provided, then it will also be used as the
+UNRELIABLE variable.
 
 ## Database
 
